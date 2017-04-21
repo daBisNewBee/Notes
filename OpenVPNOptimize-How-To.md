@@ -28,4 +28,5 @@
 - 对不具备连接条件的情况进行抽象，并及时停止服务，不再无意义的操作
 - 对具备连接条件的情况进行抽象，及时操作恢复状态。
 
-
+### 参考
+- [OpenVPN状态原文](https://github.com/daBisNewBee/Notes/blob/master/OpenVPNStateLog.md)
