@@ -83,21 +83,22 @@ void dynamicFunc()
 比如点击按钮运行“stringFromJNI”，在调用到dynamicFunc()中存在错误的内存使用，产生段错误。
 ```
 ### 2.1 gdbserver
- 1. 点击应用，运行apk服务
- 2. adb shell
+- 点击应用，运行apk服务
+- adb shell
     - ps |grep "com.example.hellojni"
 
     ```
     root@msm8974:/data/local/armeabi # ps|grep "com.example.hellojni"
-u0_a208   25704 277   1013352 27136 ffffffff 4010b8e8 S com.example.hellojni
+	u0_a208   25704 277   1013352 27136 ffffffff 4010b8e8 S com.example.hellojni
     ```
+    
     - gdbserver :7777 --attach 25704
 
     ```
     root@msm8974:/data/local/armeabi # gdbserver :7777 --attach 25704
-gdbserver :7777 --attach 25704
-Attached; pid = 25704
-Listening on port 7777
+	gdbserver :7777 --attach 25704
+	Attached; pid = 25704
+	Listening on port 7777
     ```
 
 ### 2.2 gdbclient
