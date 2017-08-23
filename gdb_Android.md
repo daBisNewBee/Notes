@@ -1,6 +1,7 @@
+
 # gdb在Android Native下的使用
-## gdb单步调试Android ELF（C/C++）
-### gdbserver
+## 1. gdb单步调试Android ELF（C/C++）
+### 1.1 gdbserver
 - adb push gdbserver /system/bin/
 
 > "gdbserver"位于host的**android-ndk-r9d\prebuilt\android-arm\gdbserver\gdbserver**
@@ -15,13 +16,15 @@
     - chmod 777 ./main
     - export LD_LIBRARY_PATH=./
     - gdbserver :7777 ./main
+
 ```
 root@msm8974:/data/local/armeabi # gdbserver :7777 main
 gdbserver :7777 main
 Process main created; pid = 2291
 Listening on port 7777
 ```
-### gdbclient
+
+### 1.2 gdbclient
 - cd D:\Installer\android-ndk-r9d\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\bin
 
 > toolchains版本默认为“arm-linux-androideabi-4.6”
@@ -32,6 +35,7 @@ E:\github\hello-jni\obj\local\armeabi\main (指定的本地可执行文件与tar
     - (gdb) b main
     - (gdb) continue (不可以用 run 或者start。main程序已经执行，只不过处于挂起状态)
     - (gdb) i sharedlibrary
+
     ```
     From        To          Syms Read   Shared Object Library
                         No          /system/bin/linker
@@ -59,7 +63,7 @@ E:\github\hello-jni\obj\local\armeabi\main (指定的本地可执行文件与tar
     ```
     - (gdb) next\step\break xxx\......
 
-## gdb快速定位Android APK crash堆栈现场
+## 2. gdb快速定位Android APK crash堆栈现场
 ```
  jstring
 Java_com_example_hellojni_HelloJni_stringFromJNI( JNIEnv* env,
@@ -78,27 +82,31 @@ void dynamicFunc()
 }
 比如点击按钮运行“stringFromJNI”，在调用到dynamicFunc()中存在错误的内存使用，产生段错误。
 ```
-### gdbserver
+### 2.1 gdbserver
  1. 点击应用，运行apk服务
  2. adb shell
     - ps |grep "com.example.hellojni"
+
     ```
     root@msm8974:/data/local/armeabi # ps|grep "com.example.hellojni"
 u0_a208   25704 277   1013352 27136 ffffffff 4010b8e8 S com.example.hellojni
     ```
     - gdbserver :7777 --attach 25704
+
     ```
     root@msm8974:/data/local/armeabi # gdbserver :7777 --attach 25704
 gdbserver :7777 --attach 25704
 Attached; pid = 25704
 Listening on port 7777
     ```
-### gdbclient
+
+### 2.2 gdbclient
 - arm-linux-androideabi-gdb.exe -q
     - (gdb) target remote :7777
     - (gdb) set solib-search-path E:\github\hello-jni\obj\local\armeabi
     - (gdb) c
     - 点击按钮，触发crash
+
     ```
     (gdb) c
     Continuing.
@@ -108,6 +116,7 @@ Listening on port 7777
     75              *p = "123";
     ```
     - (gdb) bt  // 查看堆栈信息
+
     ```
     (gdb) bt
     #0  0x7c3f2c30 in dynamicFunc () at E:/github/hello-jni//jni/hello-jni.c:75
@@ -119,8 +128,8 @@ Listening on port 7777
     Backtrace stopped: previous frame identical to this frame (corrupt stack?)
     ```
 
-## 常见问题
-### 无法**单步**调试APK下的动态库
+## 3. 常见问题
+### ~~3.1 无法**单步**调试APK下的动态库~~ `见3.6`
 ```
 (gdb) next
 
@@ -132,21 +141,23 @@ Program received signal SIGILL, Illegal instruction.
     - [root cause](https://e2e.ti.com/support/embedded/android/f/509/t/374574).
     
     > It seems that the root cause is an address offset calculation are done twice in different places. I checked the rowboat kernel code in rowboat/rowboat-am335x-kernel-3.2 branch, the code isn't fixed yet.
-    
+
     - 安全红线问题
+
 - 解决方法：
     - 添加多个断点，使用**continue**操作。使用该方法代替单步。
     
 >
 Afaict openssl probes the capabilities of the user's CPU by trying to do things and trapping the illegal instruction errors. So a couple of sigills during startup is normal. When using a debugger in order to find the real failure in your application you must **continue** past the startup sigills. 14. Use GDB commands to debug
 
-### ndk-gdb的使用
+### 3.2 ndk-gdb的使用
 
 > ndk-gdb --start --verbose --force --nowait
 
 - 这个辅助脚本集成gdbserver、gdbclient等一系列操作，这是调试apk应用的最佳方式。 
 
-### 堆栈线程信息未知
+### 3.3 堆栈线程信息未知
+
 ```
 (gdb) bt
 #0  0x400f08e8 in ?? ()
@@ -167,9 +178,11 @@ Afaict openssl probes the capabilities of the user's CPU by trying to do things 
   2    Thread 10423      0x400f0ab0 in ?? ()
 * 1    Thread 10419      0x400f08e8 in ?? ()
 ```
+
 - adb pull /system/lib/libc.so E:\github\hello-jni\obj\local\armeabi
 - (gdb) set solib-search-path E:\github\hello-jni\obj\local\armeabi
 - i sharedlibrary
+
 ```
 (gdb) i threads
   Id   Target Id         Frame
@@ -189,11 +202,104 @@ Afaict openssl probes the capabilities of the user's CPU by trying to do things 
 #1  0x4016a642 in ?? ()
 #2  0x4016a642 in ?? ()
 ```
+
 - 相关动态库的信息就打印出来了。原因就在于host上不存在target上的动态库或者版本不一致。需要将target上实际使用的动态库同步到本地
 
-## reference
+### 3.4 同步必要的手机(target)系统lib至本地(host)
+- 在host上，创建本地目录，专门存放该型号手机下的系统lib
+
+```
+mkdir ~/HUAWEI_P10
+mkidr ~/HUAWEI_P10/system_lib
+mkidr ~/HUAWEI_P10/vendor_lib
+```
+- 同步target的多个目录、文件至host
+
+```
+cd ~/Android/system_lib/
+adb pull /system/lib
+
+cd ~/Android/vendor_lib/
+adb pull /vendor/lib
+
+cd ~/Android
+# 在64位系统 /system/bin/app_process32 和 /system/bin/app_process64
+adb pull /system/bin/app_process
+
+cd ~/Android
+# 在64位系统 /system/bin/linker 和 /system/bin/linker64
+adb pull /system/bin/linker         
+```
+
+### 3.5 如何设置动态库的多路径
+
+```
+set solib-search-path J:\git\SDK-Project\TF-SDK\src\main\obj\local\armeabi;H:\Users\liuwb\HUAWEI_P10;H:\Users\liuwb\HUAWEI_P10\system_lib;H:\Users\liuwb\HUAWEI_P10\vendor_lib
+```
+
+其中：
+- 多路径之间必须用`";"`分割！！（windows环境下）
+- [原因](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0452a/CIHJHBDE.html)：
+
+```
+Multiple directories can be specified but must be separated with either:
+    a colon (Unix)
+    a semi-colon (Windows).
+```
+
+- 也可参考host本身的`PATH`,同样使用`;`分割
+
+```
+(gdb) PATH
+Executable and object file path: D:\Android\android-ndk-r9d\prebuilt\windows\bin;H:\WINDOWS\system32;H:\WINDOWS;H:\WINDOWS\System32\Wbem;H:\WINDOWS\System32\WindowsPowerShell\v1.0\;H:\Program Files (x86)\Java\jdk1.7.0_55\bin;
+```
+
+### 3.6 在非root设备中，gdb单步调试的普通APP
+
+> NDK在非root手机上调试APP的原理：gdbserver通过run-as获得与目标进程相同的UID，然后就可以ptrace到目标进程去调试了。
+
+- APP开启debuggable："android:debuggable="true""
+- 推送cmd:gdbserver至手机中某目录下
+
+```
+adb push D:\Android\android-ndk-r9d\prebuilt\android-arm\gdbserver\gdbserver /sdcard/
+```
+
+- 进入APP沙盒内（本质使得接下来的操作获得与目标APP同样的UID。原因：由于gdbserver使用ptrace注入目标进程，权限检查包括gdbserver和目标进程的uid、gid一致，而run-as可以修改gdbserver进程的uid）
+
+```
+adb shell
+run-as km.ssl
+```
+
+- 获得gdbserver命令行，拷贝至APP目录下
+
+```
+HWVKY:/data/data/km.ssl $ pwd
+/data/data/km.ssl
+
+cp /sdcard/gdbserver ./
+chmod 777 ./gdbserver
+```
+- 运行APP，获得APP进程号，attach后进行调试。（与上相同）
+
+```
+HWVKY:/sdcard $ ps|grep km.ssl
+ps|grep km.ssl
+u0_a343   16940 516   1592224 109824          0 0000000000 S km.ssl
+
+HWVKY:/data/data/km.ssl $ ./gdbserver :7777 --attach 16940
+./gdbserver :7777 --attach 16940
+Attached; pid = 16940
+Listening on port 7777
+
+```
+
+## 4. 参考
 - [大家怎么调试android c/c++?](https://www.zhihu.com/question/31993785)
 - [Android逆向系列之动态调试(五)–gdb调试](http://www.tasfa.cn/index.php/2016/06/01/android-re-gdb/)
 - [gdb 远程调试android进程](http://blog.csdn.net/xinfuqizao/article/details/7955346)
 - [Android debugging with remote GDB](https://github.com/mapbox/mapbox-gl-native/wiki/Android-debugging-with-remote-GDB)
 - [NDK调试之ndk-gdb](https://my.oschina.net/wolfcs/blog/527317)
+- [从NDK在非Root手机上的调试原理探讨Android的安全机制](http://blog.csdn.net/dj0379/article/details/43554761)
+- [非root Android 设备用gdbserver进行native 调试的方法](http://blog.csdn.net/ly890700/article/details/53104773)
