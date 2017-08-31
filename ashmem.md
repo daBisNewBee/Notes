@@ -1,7 +1,7 @@
 # 如何基于Android匿名共享内存(Ashmem)实现多进程安全(互斥)
 ## 问题/需求
 ### 实例描述：
-
+![](https://github.com/daBisNewBee/Notes/blob/master/pic/ashmem.jpg)
 - 假设一个完整的操作Operation由操作A、B、C、D组成。A、B、C、D子操作自带互斥锁，在一个完整的Opea之间，也带有多线程互斥锁。A、B、C、D操作对象为底层硬件设备（类似单片机），只支持单进程单线程下工作。且操作具有记忆，比如单个业务在进行到B操作时，另一个请求从A开始，则会打断原有B的操作，使得原有业务无法继续。
 - 图1，展示了单个进程com.ash工作在单线程/多线程模式下，由于子操作ABCD自带互斥锁，所以保证了在一个Opea中间，A、B、C、D能顺序运行；又有多线程互斥锁，保证了即使工作在多线程下，各个Opera操作也能完整独立运行。
 - 图2，问题来了。除了进程com.ash，还有一个进程com.ash:service也会进行Opera操作。且service进程发起A操作时，com.ash进程正在执行B操作，由于B带有互斥锁，因此service进程的A操作会等待，直到B操作结束，A开始执行。由于原有设备的操作现场为B，而A操作又需要操作现场A的支持，因此service进程A的乱入导致了原有操作现场B的破坏，service进程也无法继续执行。
@@ -60,4 +60,13 @@ LOGD("Mapped data.map[0]:%d	map[10]:%d",map[0],map[10]);
 - [Android Shared Memory](http://www.discoversdk.com/blog/android-shared-memory-ashmem-example)
 - [android共享内存](https://www.bbsmax.com/A/kPzORyM3dx/)
 - [Linux下的多进程间共享资源的互斥访问](http://blog.csdn.net/dlutbrucezhang/article/details/8834387)
+- [How to use Shared Memory (IPC) in Android
+](https://stackoverflow.com/questions/16099904/how-to-use-shared-memory-ipc-in-android)
+- [理解mmap](http://www.knowsky.com/1050140.html)
+- [Android Binder 分析——匿名共享内存（Ashmem）](http://light3moon.com/2015/01/28/Android%20Binder%20%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%8C%BF%E5%90%8D%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98[Ashmem]/#原理概述)
+-[Linux内存映射（mmap）  ](http://hubingforever.blog.163.com/blog/static/171040579201246113243361/)
+-[android mmap的使用](http://blog.csdn.net/kanwah200/article/details/40047211)
+
+
+
 
