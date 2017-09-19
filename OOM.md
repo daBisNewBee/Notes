@@ -156,6 +156,55 @@ class SingletonClass {
 
 
 ### 相关概念
+- 注意内存溢出（out of memory）和内存泄露（memory leak）的区别
+    - 内存溢出：申请的内存大于剩余内存空间（打开的文件过大）
+    ```
+    E/AndroidRuntime(24509): java.lang.OutOfMemoryError: Failed to allocate a 125829132 byte allocation with 16777120 free bytes and 112MB until OOM
+    ```
+    - 内存泄露：申请内存后，无法释放已申请的内存空间
+    - 内存泄露不一定内存溢出，长时间的内存泄露最终会导致内存溢出！
+- MAT的限制：排查对象引起的内存泄露较为方便，内存溢出的排查还是要看日志
+- 内存溢出OOM一般指的是**堆内存**不够
+- 如若应用确实有对大内存的需要,
+    - 可适当调整heap的大小
+    ```
+        <application
+    ......
+            android:largeHeap="true"
+    ......
+        </application>
+    ```
+    - 并查看：
+    ```
+	Runtime rt = Runtime.getRuntime();
+    long maxMemory = rt.maxMemory();
+    Log.v("art","maxMemory:"+Long.toString(maxMemory/(1024*1024)));
+    ```
+    - 查看系统默认给应用分配的内存大小
+    ```
+    HWVKY:/ $  getprop|grep heap
+    [dalvik.vm.heapgrowthlimit]: [384m]     // 实际的应用堆大小
+    [dalvik.vm.heapmaxfree]: [8m]
+    [dalvik.vm.heapminfree]: [512k]
+    [dalvik.vm.heapsize]: [512m]
+    [dalvik.vm.heapstartsize]: [8m]
+    [dalvik.vm.heaptargetutilization]: [0.75]
+    或者：
+	ActivityManager manager = (ActivityManager)getSystemService(this.ACTIVITY_SERVICE);  
+	int heapSize = manager.getMemoryClass(); // 即:heapgrowthlimit
+	int largeSize = manager.getLargeMemoryClass();  // 即:heapsize
+    
+    ```
+    - 比较了一下手里的几部手机情况：
+    
+    ||samsung-S5|huawei-P10+|HTC-M8d|
+    |---|---|---|---|
+    |**heapgrowthlimit**|128m|384m|192m|
+    |heapmaxfree|8m|8m|8m|
+    |heapminfree|2m|512k|2m|
+    |**heapsize**|512m|512m|512m|
+    |heapstartsize|8m|8m|8m|
+    |heaptargetutilization|0.75|0.75|-|
 
 
 ### 参考
@@ -163,3 +212,4 @@ class SingletonClass {
 - [管理App内存](http://www.jianshu.com/p/d061fa36a0d9)
 - [MAT使用进阶](http://www.jianshu.com/p/c8e0f8748ac0)  
 - [Android 内存剖析 – 发现潜在问题](http://www.importnew.com/2433.html)
+- [Android为每个应用分配多少内存？](https://zhuanlan.zhihu.com/p/27269803)
