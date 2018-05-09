@@ -1,10 +1,6 @@
 ## 一张图看懂AndroidKeyStore原理
 
-
-
-
-
-
+- ![](https://github.com/daBisNewBee/Notes/blob/master/pic/AndroidkeyStore.jpg)
 
 - “AndroidKeyStore”的实质
 
