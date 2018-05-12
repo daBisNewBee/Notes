@@ -34,7 +34,7 @@
 
   - 通过KeyChain
 
-- 如何在Native空间，不导出私钥材料的前提下，进行私钥的密码运算？
+- 如何在Native空间，无法导出AndroidKeyStore中私钥材料的情况下，对TEE中的KeyStore进行私钥运算？
 
   > 通过OpenSSL的”Engine“方式，重载了私钥运算方法
 
