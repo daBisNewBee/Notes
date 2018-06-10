@@ -7,3 +7,4 @@
 - [一次APP内存泄露的解决记录](https://github.com/daBisNewBee/Notes/blob/master/OOM.md)
 - [一次使用ping探测链路最小mtu的过程](https://github.com/daBisNewBee/Notes/blob/master/mtuDisc.md)
 - [一张图看懂AndroidKeyStore原理](https://github.com/daBisNewBee/Notes/blob/master/keystore.md)
+- [动手写一个O(1)的单元素LRUCache](https://github.com/daBisNewBee/Notes/blob/master/LRUCacheList.md)
