@@ -86,7 +86,7 @@ public void trimToSize(int maxSize) {
 > 2. 每次获取对象时，将当前候选者取出，并放到当前数据结构的第一个
 > 3. 下次遍历时，直接从有效候选者开始遍历
 
-**实现可参考[LRUCacheList]()，几点注意如下：**
+**实现可参考[LRUCacheList](https://github.com/daBisNewBee/JavaProject/blob/master/src/algorithm/LRUCacheList.java)，几点注意如下：**
 
 - 内部数据结构使用双向链表，可快速查找到当前节点的前、后节点，在进行删除操作时只需要O(1)的time
 - LinkedList就基于双向链表实现，因此**LRUCacheList**基于 LinkedList来实现
