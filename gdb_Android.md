@@ -296,6 +296,47 @@ Listening on port 7777
 
 ```
 
+### 3.7 TODO:gdb无法调试运行中进程
+- gdbserver 使用socket启动失败，报错：
+
+```
+130|a6pltechn:/data/data/com.ximalaya.mediaprocessor $ ./gdbserver :7777 --attach 26229                                                                                     
+ Can't open socket: Permission denied.
+Exiting
+```
+
+- gdbserver 使用管道代替，启动成功:
+
+```
+1|a6pltechn:/data/data/com.ximalaya.mediaprocessor $ ./gdbserver +debug-pipe --attach 26229                                                                                 
+Attached; pid = 26229
+Listening on Unix socket debug-pipe
+
+```
+- 此时，host下的设置需要做相应调整，表示已经建立本地10000端口到server端pipe的映射：
+
+```
+adb forward --remove-all
+
+adb forward tcp:10000 local:/data/data/com.ximalaya.mediaprocessor/debug-pipe
+
+adb forward --list
+8a329736 tcp:10000 local:/data/data/com.ximalaya.mediaprocessor/debug-piped
+
+```
+
+- 此时，gdbclient无法连接到remote上，调试中断
+
+```
+(gdb) target remote :10000
+Remote debugging using :10000
+Remote communication error.  Target disconnected.: Connection reset by peer.
+```
+
+- `arm-linux-androideabi-gdb`在新版本ndk中已经废除，需要从老版本r10e中找。
+
+
+
 ## 4. 参考
 - [大家怎么调试android c/c++?](https://www.zhihu.com/question/31993785)
 - [Android逆向系列之动态调试(五)–gdb调试](http://www.tasfa.cn/index.php/2016/06/01/android-re-gdb/)
@@ -304,3 +345,4 @@ Listening on port 7777
 - [NDK调试之ndk-gdb](https://my.oschina.net/wolfcs/blog/527317)
 - [从NDK在非Root手机上的调试原理探讨Android的安全机制](http://blog.csdn.net/dj0379/article/details/43554761)
 - [非root Android 设备用gdbserver进行native 调试的方法](http://blog.csdn.net/ly890700/article/details/53104773)
+- [Android NDK：为什么arm-linux-androideabi-gdb.exe消失了？](https://stackoverrun.com/cn/q/9975180)
