@@ -137,6 +137,7 @@ public void attachBaseContext(Context base) {
 - 对原理解释的比较好：[Android MultiDex实现原理解析](http://allenfeng.com/2016/11/17/principle-analysis-on-multidex/)
 - 对“间接引用”问题解释的比较好：[Android拆分与加载Dex的多种方案对比](https://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&mid=207151651&idx=1&sn=9eab282711f4eb2b4daf2fbae5a5ca9a&3rd=MzA3MDU4NTYzMw==&scene=6#rd)
 - 对异步加载dex，dexopt解释的比较好：[其实你不知道MultiDex到底有多坑](http://www.cnblogs.com/tonny-li/p/7839306.html)
+- 解释分包规则比较好：[Android multidex 主dex是怎么来的？](https://www.jianshu.com/p/7d49fc56d234)
 
 #### 引申
 - multiDex加载dex时间过长，容易导致的主进程ANR：
