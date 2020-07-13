@@ -9,3 +9,4 @@
 - [一张图看懂AndroidKeyStore原理](https://github.com/daBisNewBee/Notes/blob/master/keystore.md)
 - [动手写一个O(1)的单元素LRUCache](https://github.com/daBisNewBee/Notes/blob/master/LRUCacheList.md)
 - [记一次multiDex下的“java.lang.NoClassDefFoundError”的解决过程](https://github.com/daBisNewBee/Notes/blob/master/multiDex.md)
+- [一次喜马拉雅儿童版录音卡顿问题解决过程](https://github.com/daBisNewBee/Notes/blob/master/record_block.md)
