@@ -106,13 +106,13 @@ cost = 24944 ms
 我们知道了编码器耗时多，但还不知道为什么多，多在了什么地方。
 通过Simpleperf来了解一下：
 
-- 获得样本数据"perf.data"：(6576是儿童版app的进程号)
+1.获得样本数据"perf.data"：(6576是儿童版app的进程号)
 
 ```
 ./simpleperf record -p 6576 --duration 30
 ```
 
-- 从"perf.data"解析执行时间最长的共享库为“libijkffmpeg-armeabi-v7a.so”：
+2. 从"perf.data"解析执行时间最长的共享库为“libijkffmpeg-armeabi-v7a.so”：
 
 ```
 ./simpleperf report --sort dso
@@ -134,7 +134,7 @@ Overhead  Shared Object
 ........
 ```
 
-- 从最长的共享库查找执行时间最长的函数：
+3. 从最长的共享库查找执行时间最长的函数：
 
 ```
 ./simpleperf report --dsos /data/app/com.ximalaya.ting.kid-2/lib/arm/libijkffmpeg-armeabi-v7a.so --sort symbol 
