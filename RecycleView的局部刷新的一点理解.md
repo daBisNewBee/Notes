@@ -23,3 +23,5 @@
 - 为什么“detachView的效率更高于removeView”？
 	-  detach只是简单将view从数组中移除，见"removeFromArray"
 	-  removeView中会调用requestLayout()、invalidate进行重绘
+
+- 一篇比较好的文章[RecyclerView局部刷新和原理介绍](https://blog.csdn.net/ZHXLXH/article/details/88344955)
