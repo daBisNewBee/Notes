@@ -4,13 +4,13 @@
 
 - 依赖源码（调整前）
 
-![](https://github.com/daBisNewBee/Notes/upload/master/pic/qunfeng_old.png "")
+![](https://github.com/daBisNewBee/Notes/tree/master/pic/qunfeng_old.png)
 
 
 
 - 依赖aar（调整后）
 
-![](https://github.com/daBisNewBee/Notes/upload/master/pic/qunfeng_new.png "")
+![](https://github.com/daBisNewBee/Notes/tree/master/pic/qunfeng_new.png)
 
 
 
@@ -24,7 +24,7 @@
 
 ## AAR产物比较
 
-![](https://github.com/daBisNewBee/Notes/upload/master/pic/qunfeng_aar.png "")
+![](https://github.com/daBisNewBee/Notes/tree/master/pic/qunfeng_aar.png)
 
 ## 
 
